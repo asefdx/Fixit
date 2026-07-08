@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  CUSTOMER
+  TECHNICIAN
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BANNED
+}
+
+enum BookingStatus {
+  REQUESTED
+  ACCEPTED
+  DECLINED
+  PAID
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model User {
+  id          String     @id @default(cuid())
+  name        String
+  email       String     @unique
+  password    String
+  phone       String?
+  avatarUrl   String?
+  role        UserRole   @default(CUSTOMER)
+  status      UserStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  technicianProfile TechnicianProfile?
+  services          Service[]          @relation("TechnicianServices")
+  customerBookings   Booking[]          @relation("CustomerBookings")
+  technicianBookings Booking[]          @relation("TechnicianBookings")
+  customerReviews    Review[]           @relation("CustomerReviews")
+  technicianReviews  Review[]           @relation("TechnicianReviews")
+  customerPayments   Payment[]          @relation("CustomerPayments")
+
+  @@index([role])
+  @@index([status])
+  @@index([email, role])
+}
+
+model TechnicianProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  bio             String?
+  experienceYears Int?
+  location        String
+  latitude        Float?
+  longitude       Float?
+  hourlyRate      Decimal? @db.Decimal(10, 2)
+  serviceRadius   Int?
+  portfolioUrl    String?
+  skills          String[]
+  isVerified      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user        User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  availability TechnicianAvailability[]
+
+  @@index([location])
+  @@index([isVerified])
+}
+
+model TechnicianAvailability {
+  id                 String   @id @default(cuid())
+  technicianProfileId String
+  dayOfWeek          DayOfWeek
+  startTime          String
+  endTime            String
+  isAvailable        Boolean  @default(true)
+  notes              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  technicianProfile TechnicianProfile @relation(fields: [technicianProfileId], references: [id], onDelete: Cascade)
+
+  @@index([technicianProfileId, dayOfWeek])
+  @@unique([technicianProfileId, dayOfWeek, startTime, endTime])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  iconUrl     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  services Service[]
+  bookings Booking[]
+
+  @@index([isActive])
+}
+
+model Service {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  description    String
+  price          Decimal  @db.Decimal(10, 2)
+  serviceLocation String
+  durationMinutes Int?
+  imageUrl       String?
+  averageRating  Float    @default(0)
+  reviewCount    Int      @default(0)
+  isFeatured     Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  categoryId     String
+  technicianId   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  technician User?    @relation("TechnicianServices", fields: [technicianId], references: [id], onDelete: SetNull)
+  bookings   Booking[]
+  reviews    Review[]
+
+  @@index([categoryId])
+  @@index([technicianId])
+  @@index([serviceLocation])
+  @@index([price])
+  @@index([averageRating])
+  @@index([isActive, isFeatured])
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  bookingNumber String        @unique
+  customerId    String
+  technicianId  String?
+  serviceId     String
+  categoryId    String
+  scheduledAt   DateTime
+  address       String
+  location      String
+  notes         String?
+  price         Decimal       @db.Decimal(10, 2)
+  status        BookingStatus @default(REQUESTED)
+  requestedAt   DateTime      @default(now())
+  acceptedAt    DateTime?
+  declinedAt    DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+  cancelReason  String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  customer   User      @relation("CustomerBookings", fields: [customerId], references: [id], onDelete: Restrict)
+  technician User?     @relation("TechnicianBookings", fields: [technicianId], references: [id], onDelete: SetNull)
+  service    Service   @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  payment    Payment?
+  review     Review?
+
+  @@index([customerId, status])
+  @@index([technicianId, status])
+  @@index([serviceId])
+  @@index([categoryId])
+  @@index([scheduledAt])
+  @@index([status, scheduledAt])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  bookingId             String        @unique
+  customerId            String
+  transactionId         String?       @unique
+  stripePaymentIntentId String?       @unique
+  amount                Decimal       @db.Decimal(10, 2)
+  currency              String        @default("usd")
+  provider              String        @default("stripe")
+  status                PaymentStatus @default(PENDING)
+  paidAt                DateTime?
+  metadata              Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  booking  Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customer User    @relation("CustomerPayments", fields: [customerId], references: [id], onDelete: Restrict)
+
+  @@index([customerId, status])
+  @@index([provider, status])
+  @@index([paidAt])
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  bookingId    String   @unique
+  customerId   String
+  technicianId String
+  serviceId    String
+  rating       Int
+  comment      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customer   User    @relation("CustomerReviews", fields: [customerId], references: [id], onDelete: Restrict)
+  technician User    @relation("TechnicianReviews", fields: [technicianId], references: [id], onDelete: Restrict)
+  service    Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@index([customerId])
+  @@index([technicianId])
+  @@index([serviceId])
+  @@index([rating])
+}
