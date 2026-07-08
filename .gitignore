@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+.env.*
+coverage
+*.log
+*.tsbuildinfo
+prisma/migrations/*
+!prisma/migrations/.gitkeep
