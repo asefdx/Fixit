@@ -1,0 +1,407 @@
+{
+  "info": {
+    "name": "FixItNow API",
+    "description": "Postman collection for the FixItNow backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Aisha Rahman\",\"email\":\"aisha@example.com\",\"password\":\"Password@123\",\"confirmPassword\":\"Password@123\",\"phone\":\"+8801000000001\",\"role\":\"CUSTOMER\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"aisha@example.com\",\"password\":\"Password@123\"}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Current User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get User By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/users/{{userId}}"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Updated Name\",\"phone\":\"+8801000000099\"}"
+            },
+            "url": "{{baseUrl}}/api/users/profile"
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"currentPassword\":\"Password@123\",\"newPassword\":\"Password@456\",\"confirmNewPassword\":\"Password@456\"}"
+            },
+            "url": "{{baseUrl}}/api/users/password"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Technicians",
+      "item": [
+        {
+          "name": "List Technicians",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/technicians" }
+        },
+        {
+          "name": "Get Technician Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/technicians/{{technicianId}}"
+          }
+        },
+        {
+          "name": "Update Technician Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"bio\":\"Experienced home service technician.\",\"experienceYears\":7,\"location\":\"Dhaka\",\"hourlyRate\":1200,\"serviceRadius\":20,\"skills\":[\"plumbing\",\"repair\"]}"
+            },
+            "url": "{{baseUrl}}/api/technicians/profile"
+          }
+        },
+        {
+          "name": "List Availability",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/technicians/availability"
+          }
+        },
+        {
+          "name": "Create Availability",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"dayOfWeek\":\"MONDAY\",\"startTime\":\"09:00\",\"endTime\":\"17:00\"}"
+            },
+            "url": "{{baseUrl}}/api/technicians/availability"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/categories" }
+        },
+        {
+          "name": "Get Category",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categories/{{categoryId}}"
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Plumbing\",\"description\":\"Pipe repair and fitting services\"}"
+            },
+            "url": "{{baseUrl}}/api/categories"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Services",
+      "item": [
+        {
+          "name": "List Services",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/services?search=repair&page=1&limit=10"
+          }
+        },
+        {
+          "name": "Get Service",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/services/{{serviceId}}"
+          }
+        },
+        {
+          "name": "Create Service",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Emergency Pipe Repair\",\"description\":\"Fast plumbing diagnosis and repair.\",\"price\":1800,\"serviceLocation\":\"Dhaka\",\"durationMinutes\":90,\"categoryId\":\"{{categoryId}}\"}"
+            },
+            "url": "{{baseUrl}}/api/services"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"serviceId\":\"{{serviceId}}\",\"scheduledAt\":\"2026-07-09T10:00:00.000Z\",\"address\":\"123 Main Road\",\"location\":\"Dhaka\",\"notes\":\"Please call before arriving\"}"
+            },
+            "url": "{{baseUrl}}/api/bookings"
+          }
+        },
+        {
+          "name": "My Bookings",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/bookings/my" }
+        },
+        {
+          "name": "Technician Bookings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/bookings/technician"
+          }
+        },
+        {
+          "name": "Booking Details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/bookings/{{bookingId}}"
+          }
+        },
+        {
+          "name": "Accept Booking",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/bookings/{{bookingId}}/accept"
+          }
+        },
+        {
+          "name": "Decline Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"reason\":\"Not available on this slot\"}"
+            },
+            "url": "{{baseUrl}}/api/bookings/{{bookingId}}/decline"
+          }
+        },
+        {
+          "name": "Start Work",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/bookings/{{bookingId}}/start"
+          }
+        },
+        {
+          "name": "Complete Work",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/bookings/{{bookingId}}/complete"
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"reason\":\"Changed plans\"}" },
+            "url": "{{baseUrl}}/api/bookings/{{bookingId}}/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Intent",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"bookingId\":\"{{bookingId}}\"}"
+            },
+            "url": "{{baseUrl}}/api/payments/intent"
+          }
+        },
+        {
+          "name": "Confirm Payment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"paymentIntentId\":\"pi_123456789\"}"
+            },
+            "url": "{{baseUrl}}/api/payments/confirm"
+          }
+        },
+        {
+          "name": "Payment History",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/payments/history"
+          }
+        },
+        {
+          "name": "Payment Details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/payments/{{paymentId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"bookingId\":\"{{bookingId}}\",\"rating\":5,\"comment\":\"Excellent service\"}"
+            },
+            "url": "{{baseUrl}}/api/reviews"
+          }
+        },
+        {
+          "name": "Reviews By Service",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/reviews/service/{{serviceId}}"
+          }
+        },
+        {
+          "name": "Reviews By Technician",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/reviews/technician/{{technicianId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "List Users",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/admin/users" }
+        },
+        {
+          "name": "Ban User",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/admin/users/{{userId}}/ban"
+          }
+        },
+        {
+          "name": "Unban User",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/admin/users/{{userId}}/unban"
+          }
+        },
+        {
+          "name": "List Bookings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/bookings"
+          }
+        },
+        {
+          "name": "Booking Details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/admin/bookings/{{bookingId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
