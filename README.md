@@ -17,12 +17,14 @@ A production-ready Node.js + Express backend API for a home services booking pla
 ## 🚀 Key Features
 
 ### Authentication & Authorization
+
 - Role-based access control (Customer, Technician, Admin)
 - JWT-based authentication
 - Secure password hashing with bcryptjs
 - User registration with role selection
 
 ### Core Modules
+
 - **Authentication**: Register, login, JWT token validation
 - **User Management**: Profile updates, password changes, user listing (admin)
 - **Technician Management**: Profile management, availability scheduling, service offerings, enhanced listing with filters
@@ -34,6 +36,7 @@ A production-ready Node.js + Express backend API for a home services booking pla
 - **Admin Panel**: User management, booking oversight, category administration
 
 ### Validation & Error Handling
+
 - Server-side validation using Zod on all endpoints
 - Structured error responses with `{ success, message, errorDetails }`
 - Global error handling middleware
@@ -42,6 +45,7 @@ A production-ready Node.js + Express backend API for a home services booking pla
 ## 🔧 Setup Instructions
 
 ### Prerequisites
+
 - Node.js 18+
 - PostgreSQL 14+
 - Stripe API Key (https://stripe.com)
@@ -86,22 +90,26 @@ npm run dev
 ## 📚 API Documentation
 
 ### Access Points
+
 - **Swagger/OpenAPI**: `/api-docs` (interactive UI)
 - **Postman Collection**: `postman/FixItNow.postman_collection.json`
 
 ### Core Endpoints
 
 #### Authentication
+
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
 - `GET /api/auth/me` - Get current user profile
 
 #### Users
+
 - `GET /api/users/profile` - Get user profile
 - `PATCH /api/users/profile` - Update profile
 - `PATCH /api/users/password` - Change password
 
 #### Technicians
+
 - `GET /api/technician` - List technicians with filters
 - `GET /api/technician/:id` - Get technician profile with reviews
 - `PATCH /api/technician/profile` - Update technician profile
@@ -110,6 +118,7 @@ npm run dev
 - `DELETE /api/technician/availability/:id` - Delete availability
 
 #### Services
+
 - `GET /api/services` - List services with search/filter
 - `POST /api/services` - Create service (technician only)
 - `GET /api/services/:id` - Get service details
@@ -117,6 +126,7 @@ npm run dev
 - `DELETE /api/services/:id` - Delete service
 
 #### Bookings
+
 - `POST /api/bookings` - Create booking
 - `GET /api/bookings` - List bookings (role-based)
 - `GET /api/bookings/:id` - Get booking details
@@ -127,17 +137,20 @@ npm run dev
 - `PATCH /api/bookings/:id/cancel` - Cancel booking (customer)
 
 #### Payments
+
 - `POST /api/payments/create` - Create payment intent
 - `POST /api/payments/confirm` - Confirm payment
 - `GET /api/payments` - List payment history
 - `GET /api/payments/:id` - Get payment details
 
 #### Reviews
+
 - `POST /api/reviews` - Create review (customer, post-completion)
 - `GET /api/reviews/service/:serviceId` - List service reviews
 - `GET /api/reviews/technician/:technicianId` - List technician reviews
 
 #### Admin
+
 - `GET /api/admin/users` - List all users (with filters)
 - `PATCH /api/admin/users/:id` - Update user
 - `PATCH /api/admin/users/:id/ban` - Ban user
@@ -148,6 +161,7 @@ npm run dev
 ## 🧪 Testing
 
 ### Using Postman
+
 1. Import `postman/FixItNow.postman_collection.json`
 2. Set Bearer token in authorization
 3. Test endpoints in organized folder structure
@@ -155,14 +169,17 @@ npm run dev
 ### Sample Credentials
 
 **Admin Account**
+
 - Email: `admin@fixitnow.dev`
 - Password: `Password@123`
 
 **Test Customer**
+
 - Email: `customer1@fixitnow.dev`
 - Password: `Password@123`
 
 **Test Technician**
+
 - Email: `technician1@fixitnow.dev`
 - Password: `Password@123`
 
@@ -215,6 +232,7 @@ prisma/
 ## 📝 Commit History
 
 This project includes 20 meaningful commits covering:
+
 1. Project initialization and setup
 2. Database schema and Prisma ORM
 3. Configuration management
@@ -258,6 +276,7 @@ NODE_ENV=production
 ## 📊 API Response Format
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -267,6 +286,7 @@ NODE_ENV=production
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -287,7 +307,7 @@ PAID (after Stripe payment)
 IN_PROGRESS (technician starts work)
     ↓
 COMPLETED (technician marks complete)
-    
+
 Alternative:
 REQUESTED → DECLINED (by technician)
 REQUESTED/ACCEPTED → CANCELLED (by customer)
