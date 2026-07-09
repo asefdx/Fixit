@@ -257,6 +257,18 @@ npm run build
 npm run dev
 ```
 
+### 1.1 Render Environment Variables
+
+Use these keys in Render and enter the matching values from your production setup:
+
+| Key                   | Value       |
+| --------------------- | ----------- |
+| DATABASE_URL          | Enter value |
+| JWT_SECRET            | Enter value |
+| FRONTEND_URL          | Enter value |
+| STRIPE_SECRET_KEY     | Enter value |
+| STRIPE_WEBHOOK_SECRET | Enter value |
+
 ### 2. Test Admin Access
 
 ```
