@@ -38,22 +38,23 @@ export const technicianProfileSchema = z.object({
     .min(1, "At least one skill is required"),
 });
 
-export const availabilitySchema = z
-  .object({
-    dayOfWeek: z.nativeEnum(DayOfWeek),
-    startTime: z
-      .string()
-      .regex(timePattern, "Start time must use HH:MM format"),
-    endTime: z.string().regex(timePattern, "End time must use HH:MM format"),
-    isAvailable: z.boolean().optional(),
-    notes: z.string().trim().optional(),
-  })
-  .refine((data) => data.startTime !== data.endTime, {
+const availabilityBaseSchema = z.object({
+  dayOfWeek: z.nativeEnum(DayOfWeek),
+  startTime: z.string().regex(timePattern, "Start time must use HH:MM format"),
+  endTime: z.string().regex(timePattern, "End time must use HH:MM format"),
+  isAvailable: z.boolean().optional(),
+  notes: z.string().trim().optional(),
+});
+
+export const availabilitySchema = availabilityBaseSchema.refine(
+  (data) => data.startTime !== data.endTime,
+  {
     message: "Start time and end time must be different",
     path: ["endTime"],
-  });
+  },
+);
 
-export const updateAvailabilitySchema = availabilitySchema.partial().refine(
+export const updateAvailabilitySchema = availabilityBaseSchema.partial().refine(
   (data) => {
     if (data.startTime && data.endTime) {
       return data.startTime !== data.endTime;
