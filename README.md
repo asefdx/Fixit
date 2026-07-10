@@ -11,7 +11,7 @@ A production-ready Node.js + Express backend API for a home services booking pla
 - **Authentication**: JWT (JSON Web Tokens)
 - **Validation**: Zod
 - **Payment**: Stripe
-- **API Documentation**: Swagger/OpenAPI + Postman
+- **API Documentation**:  Postman
 - **Deployment**: Render
 
 ## Key Features
