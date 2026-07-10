@@ -2,7 +2,7 @@
 
 A production-ready Node.js + Express backend API for a home services booking platform with integrated Stripe payment processing.
 
-## 📋 Tech Stack
+## Tech Stack
 
 - **Runtime**: Node.js 18+
 - **Framework**: Express.js
@@ -14,7 +14,7 @@ A production-ready Node.js + Express backend API for a home services booking pla
 - **API Documentation**: Swagger/OpenAPI + Postman
 - **Deployment**: Render
 
-## 🚀 Key Features
+## Key Features
 
 ### Authentication & Authorization
 
@@ -42,7 +42,7 @@ A production-ready Node.js + Express backend API for a home services booking pla
 - Global error handling middleware
 - Consistent HTTP status codes
 
-## 🔧 Setup Instructions
+##  Setup Instructions
 
 ### Prerequisites
 
@@ -87,7 +87,7 @@ npm start
 npm run dev
 ```
 
-## 📚 API Documentation
+##  API Documentation
 
 ### Access Points
 
@@ -158,7 +158,7 @@ npm run dev
 - `GET /api/admin/bookings` - List all bookings
 - `GET /api/admin/categories` - Manage categories
 
-## 🧪 Testing
+##  Testing
 
 ### Using Postman
 
@@ -183,7 +183,7 @@ npm run dev
 - Email: `technician1@fixitnow.dev`
 - Password: `Password@123`
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 src/
@@ -219,7 +219,7 @@ prisma/
 └── seed.ts              # Database seeding script
 ```
 
-## 🔒 Security Features
+##  Security Features
 
 - JWT-based authentication with expiration
 - Role-based access control (RBAC)
@@ -229,98 +229,5 @@ prisma/
 - Error details hidden from client in production
 - Secure Stripe payment processing
 
-## 📝 Commit History
 
-This project includes 20 meaningful commits covering:
 
-1. Project initialization and setup
-2. Database schema and Prisma ORM
-3. Configuration management
-4. Core middleware and error handling
-5. Authentication module
-6. User management module
-7. Technician management module
-8. Category management
-9. Service management with advanced filtering
-10. Booking lifecycle with state machine
-11. Stripe payment integration
-12. Review system
-13. Admin module for platform oversight
-14. Express application setup
-15. Server entry point
-16. Deployment configuration
-17. Postman collection documentation
-18. Environment variables template
-
-Each commit represents a logical feature or architectural layer, making the project history clear and maintainable.
-
-## 🚀 Deployment
-
-### Deploy to Render
-
-1. Push code to GitHub
-2. Connect repository to Render
-3. Set environment variables in Render dashboard
-4. Render will automatically build and deploy using `render.yaml`
-
-### Required Environment Variables
-
-```
-DATABASE_URL=postgresql://user:password@host/dbname
-JWT_SECRET=your-secret-key-here
-STRIPE_SECRET_KEY=sk_live_or_sk_test_key
-PORT=3000
-NODE_ENV=production
-```
-
-## 📊 API Response Format
-
-### Success Response
-
-```json
-{
-  "success": true,
-  "message": "Operation completed successfully",
-  "data": {}
-}
-```
-
-### Error Response
-
-```json
-{
-  "success": false,
-  "message": "Error message",
-  "errorDetails": {}
-}
-```
-
-## 🔄 Booking State Machine
-
-```
-REQUESTED
-    ↓
-ACCEPTED (by technician)
-    ↓
-PAID (after Stripe payment)
-    ↓
-IN_PROGRESS (technician starts work)
-    ↓
-COMPLETED (technician marks complete)
-
-Alternative:
-REQUESTED → DECLINED (by technician)
-REQUESTED/ACCEPTED → CANCELLED (by customer)
-```
-
-## 📄 License
-
-MIT
-
-## 👤 Author
-
-FixItNow Development Team
-
----
-
-**For questions or issues, please refer to the API documentation or contact the development team.**
