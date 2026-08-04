@@ -1,5 +1,6 @@
 import { BookingStatus, PaymentStatus, UserRole } from "@prisma/client";
 
+import { env } from "../../config/env";
 import { prisma } from "../../config/prisma";
 import { getStripeClient } from "../../config/stripe";
 import { AppError } from "../../errors/AppError";
@@ -7,6 +8,40 @@ import type {
   ConfirmPaymentInput,
   CreatePaymentIntentInput,
 } from "./payment.validation";
+
+export type PaymentProvider = "stripe" | "sslcommerz";
+
+export const resolvePaymentProvider = (
+  provider?: string | null,
+): PaymentProvider => {
+  if (provider === "sslcommerz") {
+    return "sslcommerz";
+  }
+
+  if (provider === "stripe") {
+    return "stripe";
+  }
+
+  return env.stripeSecretKey ? "stripe" : "sslcommerz";
+};
+
+export const buildSslCommerzRedirectData = ({
+  bookingId,
+  customerId,
+  transactionId,
+  amount,
+  bookingNumber,
+}: {
+  bookingId: string;
+  customerId: string;
+  transactionId: string;
+  amount: string | number;
+  bookingNumber: string;
+}) => ({
+  provider: "sslcommerz" as const,
+  transactionId,
+  redirectUrl: `https://sandbox.sslcommerz.com/gwprocess/v4/bank/transaction/redirect?bookingId=${encodeURIComponent(bookingId)}&customerId=${encodeURIComponent(customerId)}&transactionId=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(String(amount))}&bookingNumber=${encodeURIComponent(bookingNumber)}`,
+});
 
 const paymentSelect = {
   id: true,
@@ -104,20 +139,64 @@ export const paymentService = {
       throw new AppError(400, "This booking has already been paid");
     }
 
-    const stripe = getStripeClient();
-    const amount = Math.round(Number(booking.price) * 100);
+    const provider = resolvePaymentProvider(payload.provider);
+    const amount = Number(booking.price);
+    const transactionId = `pay_${booking.id}_${Date.now()}`;
 
-    const intent = await stripe.paymentIntents.create({
-      amount,
-      currency: "usd",
-      automatic_payment_methods: {
-        enabled: true,
-      },
-      metadata: {
-        bookingId: booking.id,
-        customerId: booking.customerId,
-      },
-    });
+    if (provider === "stripe") {
+      const stripe = getStripeClient();
+      const intent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100),
+        currency: "usd",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          bookingId: booking.id,
+          customerId: booking.customerId,
+        },
+      });
+
+      const payment = await prisma.payment.upsert({
+        where: {
+          bookingId: booking.id,
+        },
+        create: {
+          bookingId: booking.id,
+          customerId: booking.customerId,
+          transactionId: null,
+          stripePaymentIntentId: intent.id,
+          amount: booking.price,
+          currency: "usd",
+          provider: "stripe",
+          status: PaymentStatus.PENDING,
+          metadata: {
+            bookingNumber: booking.bookingNumber,
+            provider,
+          },
+        },
+        update: {
+          customerId: booking.customerId,
+          transactionId: null,
+          stripePaymentIntentId: intent.id,
+          amount: booking.price,
+          currency: "usd",
+          provider: "stripe",
+          status: PaymentStatus.PENDING,
+          metadata: {
+            bookingNumber: booking.bookingNumber,
+            provider,
+          },
+        },
+        select: paymentSelect,
+      });
+
+      return {
+        payment,
+        provider,
+        clientSecret: intent.client_secret,
+      };
+    }
 
     const payment = await prisma.payment.upsert({
       where: {
@@ -126,26 +205,28 @@ export const paymentService = {
       create: {
         bookingId: booking.id,
         customerId: booking.customerId,
-        transactionId: null,
-        stripePaymentIntentId: intent.id,
+        transactionId,
+        stripePaymentIntentId: null,
         amount: booking.price,
         currency: "usd",
-        provider: "stripe",
+        provider: "sslcommerz",
         status: PaymentStatus.PENDING,
         metadata: {
           bookingNumber: booking.bookingNumber,
+          provider,
         },
       },
       update: {
         customerId: booking.customerId,
-        transactionId: null,
-        stripePaymentIntentId: intent.id,
+        transactionId,
+        stripePaymentIntentId: null,
         amount: booking.price,
         currency: "usd",
-        provider: "stripe",
+        provider: "sslcommerz",
         status: PaymentStatus.PENDING,
         metadata: {
           bookingNumber: booking.bookingNumber,
+          provider,
         },
       },
       select: paymentSelect,
@@ -153,7 +234,14 @@ export const paymentService = {
 
     return {
       payment,
-      clientSecret: intent.client_secret,
+      provider,
+      redirectUrl: buildSslCommerzRedirectData({
+        bookingId: booking.id,
+        customerId: booking.customerId,
+        transactionId,
+        amount,
+        bookingNumber: booking.bookingNumber,
+      }).redirectUrl,
     };
   },
 

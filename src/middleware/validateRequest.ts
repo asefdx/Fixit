@@ -1,9 +1,22 @@
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler } from "express";
 import type { ZodTypeAny } from "zod";
 
 import { AppError } from "../errors/AppError";
 
 type RequestSegment = "body" | "params" | "query";
+
+const assignRequestSegment = (
+  req: Request,
+  segment: RequestSegment,
+  value: unknown,
+) => {
+  Object.defineProperty(req, segment, {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    value,
+  });
+};
 
 export const validateRequest = (
   schema: ZodTypeAny,
@@ -18,7 +31,7 @@ export const validateRequest = (
       );
     }
 
-    (req as unknown as Record<RequestSegment, unknown>)[segment] = result.data;
+    assignRequestSegment(req, segment, result.data);
     next();
   };
 };
