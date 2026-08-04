@@ -55,12 +55,24 @@ export async function request<T>(
     }
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-    body,
-    cache: "no-store",
-  });
+  const url = `${API_BASE_URL}${path}`;
+
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+      body,
+      cache: "no-store",
+    });
+  } catch (error) {
+    throw new ApiError(
+      "Unable to reach the API service.",
+      503,
+      error instanceof Error ? error.message : error,
+    );
+  }
 
   const contentType = response.headers.get("content-type") ?? "";
   const payload = contentType.includes("application/json")

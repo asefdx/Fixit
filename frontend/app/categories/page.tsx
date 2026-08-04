@@ -1,7 +1,19 @@
 import { catalogService } from "@/services/catalog";
 
+export const dynamic = "force-dynamic";
+
 export default async function CategoriesPage() {
-  const categories = await catalogService.getCategories();
+  let categories: Array<{
+    id: string;
+    name: string;
+    description?: string | null;
+  }> = [];
+
+  try {
+    categories = await catalogService.getCategories();
+  } catch {
+    categories = [];
+  }
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
